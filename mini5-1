@@ -1,0 +1,84 @@
+#http://www.codeskulptor.org/#user31_Xe85ZwpvSPpHmlo.py
+# implementation of card game - Memory
+
+import simplegui
+import random
+
+list1 = range(8)
+list2 = list1 + list1
+state = 0
+card_no = []
+turn = 0
+exposed = []
+# helper function to initialize globals
+def new_game():
+    global state, turn, exposed, card_no
+    exposed = [False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
+    state = 0
+    random.shuffle(list2)
+    turn = 0
+    card_no = []
+    label.set_text("Turn = 0")
+    
+     
+# define event handlers
+def mouseclick(pos):
+    # add game state logic here
+    
+    global state, card_no, turn
+    
+    clicked = pos[0]/50
+    #print pos[0]/50
+    if state == 0 and exposed[clicked] != True:
+        state = 1
+        
+    elif state == 1 and exposed[clicked] != True:
+        state = 2
+        turn += 1
+        label.set_text("Turns = "+str(turn))
+        
+    elif state == 2 and exposed[clicked] != True:
+        print card_no
+         
+        if list2[card_no[0]] != list2[card_no[1]]:
+            exposed[card_no[0]] = False
+            exposed[card_no[1]] = False
+        state = 1
+        card_no.pop()
+        card_no.pop()
+    
+    if not exposed[clicked]:
+        exposed[clicked] = True
+        card_no.append(clicked)    
+        
+                           
+# cards are logically 50x100 pixels in size    
+def draw(canvas):
+    no_pos = [12, 62]
+    card_top_pos = [25 , 0]
+    card_bot_pos = [25 , 100]
+    for i in range(16):
+        if exposed[i]:
+            canvas.draw_text(str(list2[i]),  no_pos, 50, "White")
+        else:
+            canvas.draw_line(card_top_pos, card_bot_pos, 49, "Green")
+        card_top_pos[0] += 50
+        card_bot_pos[0] += 50
+        no_pos[0] += 50
+    
+
+# create frame and add a button and labels
+frame = simplegui.create_frame("Memory", 800, 100)
+frame.add_button("Reset", new_game)
+label = frame.add_label("Turns = 0")
+
+# register event handlers
+frame.set_mouseclick_handler(mouseclick)
+frame.set_draw_handler(draw)
+
+# get things rolling
+new_game()
+frame.start()
+
+
+# Always remember to review the grading rubric
